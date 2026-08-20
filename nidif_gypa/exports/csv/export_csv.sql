@@ -1,7 +1,5 @@
 -- Export des observations
 
-
-
 CREATE OR REPLACE VIEW gn_monitoring.v_export_nidif_gypa_observations
 AS WITH observers AS (
          SELECT string_agg(concat(tr.nom_role, ' ', tr.prenom_role), ', '::text) AS observateurs,
@@ -24,12 +22,12 @@ AS WITH observers AS (
     tvc.data ->> 'etat_aire'::text AS etat_aire,
     obs.id_observation,
     t.lb_nom AS tax_nom_scientifique,
-    tn.label_fr AS comportement,
     tn3.label_fr AS stade_vie,
     tn4.label_fr AS sexe,
     obs.comments AS comment_obs,
     toc.data ->> 'count'::text AS denombrement,
     toc.data ->> 'indiv_a_aire'::text AS indiv_a_aire,
+    toc.data ->> 'comportement'::text AS comportement,
     toc.data ->> 'chargement_aire'::text AS chargement_aire,
     toc.data ->> 'bague_plastique'::text AS bague_plastique,
     toc.data ->> 'bague_mnhn'::text AS bague_mnhn,
@@ -59,7 +57,6 @@ AS WITH observers AS (
      JOIN gn_monitoring.t_observations obs ON obs.id_base_visit = tbv.id_base_visit
      LEFT JOIN gn_monitoring.t_observation_complements toc ON toc.id_observation = obs.id_observation
      LEFT JOIN taxonomie.taxref t ON t.cd_nom = obs.cd_nom
-     LEFT JOIN ref_nomenclatures.t_nomenclatures tn ON ((toc.data ->> 'id_nomenclature_behaviour'::text)::integer) = tn.id_nomenclature
      LEFT JOIN ref_nomenclatures.t_nomenclatures tn3 ON ((toc.data ->> 'id_nomenclature_life_stage'::text)::integer) = tn3.id_nomenclature
      LEFT JOIN ref_nomenclatures.t_nomenclatures tn4 ON ((toc.data ->> 'id_nomenclature_sex'::text)::integer) = tn4.id_nomenclature
   WHERE m.module_code::text = 'nidif_gypa'::text;
